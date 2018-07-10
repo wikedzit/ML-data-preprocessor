@@ -2,6 +2,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+from sklearn.preprocessing import Imputer
 
 class Preprocessor:
     dataset = []
@@ -27,8 +28,15 @@ class Preprocessor:
             self.targetVariable = self.dataset.iloc[:,0].values
             self.independentVariables = self.dataset.iloc[:,1:-1].values
             
-            
+    def processMissingData(self, missingValues = 'NaN', pStrategy = 'mean', axisOrientation = 0, dataColumns = []):
+        if not dataColumns:
+            return
+        
+        imputer = Imputer(missing_values = missingValues, strategy = pStrategy, axis = axisOrientation)
+        imputer = imputer.fit(self.independentVariables[:, dataColumns])
+        self.independentVariables[:, dataColumns] = imputer.transform(self.independentVariables[:,dataColumns])
+        
+        
 preprocessor = Preprocessor('Data.csv')
-
-Y = preprocessor.targetVariable
+preprocessor.processMissingData(dataColumns = [1,2])
 X = preprocessor.independentVariables
